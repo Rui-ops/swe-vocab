@@ -1,0 +1,11 @@
+{
+  "partOfSpeechTags": {
+    "verb": ["verb"],
+    "phrase": ["spoken", "conversation"]
+  },
+  "priorityTags": {
+    "5": ["high_priority", "common"],
+    "4": ["useful"]
+  }
+}
+

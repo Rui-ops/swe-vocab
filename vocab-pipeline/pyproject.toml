@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swedish-vocab-pipeline"
+version = "0.1.0"
+description = "Data ingestion and validation scaffold for the Swedish vocab app."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.setuptools]
+packages = ["vocab_pipeline"]
+

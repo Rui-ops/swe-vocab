@@ -1,0 +1,2 @@
+"""Swedish vocabulary pipeline scaffold."""
+

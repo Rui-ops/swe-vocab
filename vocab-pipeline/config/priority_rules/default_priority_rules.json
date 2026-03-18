@@ -1,0 +1,10 @@
+{
+  "rankBands": [
+    { "maxRank": 500, "priority": 5 },
+    { "maxRank": 1200, "priority": 4 },
+    { "maxRank": 2500, "priority": 3 },
+    { "maxRank": 4000, "priority": 2 }
+  ],
+  "fallbackPriority": 1
+}
+

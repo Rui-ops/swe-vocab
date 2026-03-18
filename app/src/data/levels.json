@@ -1,0 +1,22 @@
+[
+  {
+    "id": "A1",
+    "label": "A1",
+    "description": "First essential words and phrases."
+  },
+  {
+    "id": "A2",
+    "label": "A2",
+    "description": "Default starter level for short daily recall."
+  },
+  {
+    "id": "B1",
+    "label": "B1",
+    "description": "Adds more flexible conversation vocabulary."
+  },
+  {
+    "id": "B2",
+    "label": "B2",
+    "description": "Adds less obvious and more discussion-ready vocabulary."
+  }
+]

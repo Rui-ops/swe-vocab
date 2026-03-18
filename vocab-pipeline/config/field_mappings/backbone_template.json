@@ -1,0 +1,11 @@
+{
+  "lemma": "lemma",
+  "swedish": "surface",
+  "english": "translations",
+  "partOfSpeech": "pos",
+  "frequencyRank": "rank",
+  "cefrLevel": "cefr",
+  "exampleSv": "example_sv",
+  "exampleEn": "example_en"
+}
+
