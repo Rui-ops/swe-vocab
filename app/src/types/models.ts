@@ -59,6 +59,12 @@ export interface LevelSummary {
   description: string;
 }
 
+export interface AppDataset {
+  levels: LevelSummary[];
+  packs: PackSummary[];
+  vocabItems: VocabularyItem[];
+}
+
 export interface AppSettings {
   selectedLevel: CefrLevel;
   enabledTestModes: TestMode[];
@@ -83,6 +89,13 @@ export interface ProgressSnapshot {
   masteredCount: number;
   lastStudiedAt: string | null;
   itemRecords: Record<string, ProgressItemRecord>;
+}
+
+export interface DailyPackSnapshot {
+  date: string;
+  newItemIds: string[];
+  completedNewItemIds: string[];
+  generated: boolean;
 }
 
 export interface StudyCard {
@@ -116,6 +129,8 @@ export interface SessionSummary {
   completedAt: string;
   mode: TestMode;
   studiedCount: number;
+  reviewCount: number;
+  newCount: number;
   easyCount: number;
   hardCount: number;
   wrongCount: number;

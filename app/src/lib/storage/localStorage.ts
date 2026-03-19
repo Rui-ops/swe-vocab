@@ -1,8 +1,14 @@
-import type { AppSettings, ProgressSnapshot, SessionSummary } from "../../types/models";
+import type {
+  AppSettings,
+  DailyPackSnapshot,
+  ProgressSnapshot,
+  SessionSummary,
+} from "../../types/models";
 
 const SETTINGS_KEY = "swedish-vocab.settings";
 const PROGRESS_KEY = "swedish-vocab.progress";
 const SESSION_HISTORY_KEY = "swedish-vocab.sessionHistory";
+const DAILY_PACK_KEY = "swedish-vocab.dailyPack";
 
 const hasWindow = () => typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 
@@ -35,6 +41,7 @@ export const storageKeys = {
   settings: SETTINGS_KEY,
   progress: PROGRESS_KEY,
   sessionHistory: SESSION_HISTORY_KEY,
+  dailyPack: DAILY_PACK_KEY,
 } as const;
 
 export function loadSettings(fallback: AppSettings): AppSettings {
@@ -61,3 +68,10 @@ export function saveSessionHistory(value: SessionSummary[]): void {
   safeWrite(SESSION_HISTORY_KEY, value);
 }
 
+export function loadDailyPack(fallback: DailyPackSnapshot | null): DailyPackSnapshot | null {
+  return safeRead(DAILY_PACK_KEY, fallback);
+}
+
+export function saveDailyPack(value: DailyPackSnapshot | null): void {
+  safeWrite(DAILY_PACK_KEY, value);
+}

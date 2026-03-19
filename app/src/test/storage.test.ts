@@ -1,14 +1,21 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import {
+  loadDailyPack,
   loadProgress,
   loadSessionHistory,
   loadSettings,
+  saveDailyPack,
   saveProgress,
   saveSessionHistory,
   saveSettings,
   storageKeys,
 } from "../lib/storage/localStorage";
-import type { AppSettings, ProgressSnapshot, SessionSummary } from "../types/models";
+import type {
+  AppSettings,
+  DailyPackSnapshot,
+  ProgressSnapshot,
+  SessionSummary,
+} from "../types/models";
 
 const defaultSettings: AppSettings = {
   selectedLevel: "A2",
@@ -33,11 +40,20 @@ const defaultHistory: SessionSummary[] = [
     completedAt: "2026-03-16T10:00:00.000Z",
     mode: "svToEn",
     studiedCount: 3,
+    reviewCount: 1,
+    newCount: 2,
     easyCount: 1,
     hardCount: 1,
     wrongCount: 1,
   },
 ];
+
+const defaultDailyPack: DailyPackSnapshot = {
+  date: "2026-03-19",
+  newItemIds: ["sv_000001", "sv_000002", "sv_000003"],
+  completedNewItemIds: ["sv_000001"],
+  generated: true,
+};
 
 describe("local storage helpers", () => {
   beforeEach(() => {
@@ -62,5 +78,15 @@ describe("local storage helpers", () => {
   it("round-trips session history", () => {
     saveSessionHistory(defaultHistory);
     expect(loadSessionHistory([])).toEqual(defaultHistory);
+  });
+
+  it("round-trips daily pack state", () => {
+    saveDailyPack(defaultDailyPack);
+    expect(loadDailyPack(null)).toEqual(defaultDailyPack);
+  });
+
+  it("falls back for invalid daily pack JSON", () => {
+    window.localStorage.setItem(storageKeys.dailyPack, "{invalid");
+    expect(loadDailyPack(null)).toBeNull();
   });
 });

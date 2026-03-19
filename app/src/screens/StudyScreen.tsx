@@ -26,7 +26,7 @@ export function StudyScreen({
           <h2>No items available</h2>
           <p>
             Adjust your current level or enabled packs in Settings to build a study session from
-            the sample dataset.
+            the current vocabulary library.
           </p>
           <div className="actions">
             <button className="button button--primary" onClick={onGoToSettings}>

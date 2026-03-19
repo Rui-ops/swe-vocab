@@ -35,7 +35,7 @@ To enable it in GitHub:
 Lean v1 target:
 
 - one daily review loop
-- one starter pack
+- 30 new words per local day from one fixed daily pack
 - Swedish -> English as the primary study direction
 - simple local review scheduling
 - local progress persistence
@@ -44,10 +44,12 @@ Current app status:
 
 - phone-first shell
 - Home, Study, Session Summary, Progress, and Settings as the primary flow
-- one starter dataset in `app/src/data/vocab_master.json`
+- pipeline-backed `app/public/data/vocab_master.json` with 3,634 generated entries
+- CEFR core packs across `A1`, `A2`, `B1`, and `B2`
 - deterministic review engine with retry-once behavior
+- calendar-day daily packs that stay fixed for the whole local day
 - typed local storage persistence for settings, progress, and session history
 
 ## Pipeline
 
-See [vocab-pipeline/README.md](/home/ruizhi/Mmmsk/swe-vocab/vocab-pipeline/README.md) for the lean pipeline flow. The main v1 target is one app-ready JSON dataset.
+See [vocab-pipeline/README.md](/home/ruizhi/Mmmsk/swe-vocab/vocab-pipeline/README.md) for the lean pipeline flow. The main v1 target is one app-ready JSON dataset and the repo currently ships a generated 3,634-entry library.

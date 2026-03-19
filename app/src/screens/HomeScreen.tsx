@@ -8,7 +8,9 @@ interface HomeScreenProps {
   packs: PackSummary[];
   vocabItems: VocabularyItem[];
   dueReviewCount: number;
-  newItemCount: number;
+  dailyPackSize: number;
+  remainingNewItemCount: number;
+  dailyPackGenerated: boolean;
   onStartStudy: () => void;
 }
 
@@ -18,7 +20,9 @@ export function HomeScreen({
   packs,
   vocabItems,
   dueReviewCount,
-  newItemCount,
+  dailyPackSize,
+  remainingNewItemCount,
+  dailyPackGenerated,
   onStartStudy,
 }: HomeScreenProps) {
   const enabledPackCount = settings.enabledPackIds.length;
@@ -33,16 +37,20 @@ export function HomeScreen({
     >
       <div className="grid grid--two">
         <StatCard label="Level" value={settings.selectedLevel} hint="Current study level" />
-        <StatCard label="Starter pack" value={enabledPackCount} hint={packs[0]?.title ?? "Core"} />
+        <StatCard label="Active packs" value={enabledPackCount} hint={packs[0]?.title ?? "Core"} />
         <StatCard label="Due review" value={dueReviewCount} hint="Ready now" />
-        <StatCard label="New items" value={newItemCount} hint={`${enabledItemCount} eligible`} />
+        <StatCard
+          label="Today's pack"
+          value={remainingNewItemCount}
+          hint={dailyPackGenerated ? `${dailyPackSize} generated today` : `${enabledItemCount} eligible`}
+        />
       </div>
 
       <div className="panel">
         <h2>Start a real study session</h2>
         <p>
-          The default path is Swedish to English recall using one starter pack. Reverse recall is
-          optional and can stay off until the core habit loop feels solid.
+          One new-word pack is generated per local calendar day from your enabled CEFR core packs.
+          It stays fixed for the whole day and refreshes on the next local day.
         </p>
         <div className="actions">
           <button className="button button--primary" onClick={onStartStudy}>
@@ -50,7 +58,8 @@ export function HomeScreen({
           </button>
         </div>
         <p className="meta">
-          {progress.sessionsCompleted} sessions completed • {progress.masteredCount} mastered items
+          {progress.sessionsCompleted} sessions completed • {progress.masteredCount} mastered items •{" "}
+          {remainingNewItemCount} new words left today
         </p>
       </div>
     </ScreenLayout>

@@ -1,6 +1,7 @@
 import type {
   AppSettings,
   CefrLevel,
+  DailyPackSnapshot,
   ItemState,
   ProgressItemRecord,
   ProgressSnapshot,
@@ -23,8 +24,16 @@ const cefrRank: Record<CefrLevel, number> = {
 
 export interface StudyQueueBreakdown {
   dueReviewCount: number;
-  newItemCount: number;
+  dailyPackSize: number;
+  remainingNewItemCount: number;
+  dailyPackGenerated: boolean;
   totalCount: number;
+}
+
+export interface DailyStudyQueue {
+  dueItems: VocabularyItem[];
+  newItems: VocabularyItem[];
+  queue: VocabularyItem[];
 }
 
 function addDays(isoDate: string, days: number): string {
@@ -50,13 +59,54 @@ function getEligibleItems(settings: AppSettings, vocabItems: VocabularyItem[]): 
   return vocabItems.filter((item) => isEligibleItem(settings, item));
 }
 
+function getUnseenEligibleItems(
+  settings: AppSettings,
+  vocabItems: VocabularyItem[],
+  progress: ProgressSnapshot,
+): VocabularyItem[] {
+  return getEligibleItems(settings, vocabItems).filter((item) => !progress.itemRecords[item.id]);
+}
+
+export function getLocalDateKey(now: Date): string {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function ensureDailyPack(
+  settings: AppSettings,
+  vocabItems: VocabularyItem[],
+  progress: ProgressSnapshot,
+  existingDailyPack: DailyPackSnapshot | null,
+  todayKey: string,
+): DailyPackSnapshot {
+  if (existingDailyPack && existingDailyPack.date === todayKey) {
+    return existingDailyPack;
+  }
+
+  const unseenEligibleItems = getUnseenEligibleItems(settings, vocabItems, progress).slice(
+    0,
+    settings.dailyNewItemCount,
+  );
+
+  return {
+    date: todayKey,
+    newItemIds: unseenEligibleItems.map((item) => item.id),
+    completedNewItemIds: [],
+    generated: true,
+  };
+}
+
 export function buildDailyStudyQueue(
   settings: AppSettings,
   vocabItems: VocabularyItem[],
   progress: ProgressSnapshot,
+  dailyPack: DailyPackSnapshot | null,
   now: string,
-): VocabularyItem[] {
+): DailyStudyQueue {
   const eligibleItems = getEligibleItems(settings, vocabItems);
+  const itemMap = new Map(eligibleItems.map((item) => [item.id, item]));
 
   const dueItems = eligibleItems
     .filter((item) => {
@@ -71,17 +121,25 @@ export function buildDailyStudyQueue(
     .slice(0, settings.dailyReviewLimit);
 
   const dueIds = new Set(dueItems.map((item) => item.id));
-  const newItems = eligibleItems
-    .filter((item) => !progress.itemRecords[item.id] && !dueIds.has(item.id))
-    .slice(0, settings.dailyNewItemCount);
+  const completedNewItemIds = new Set(dailyPack?.completedNewItemIds ?? []);
+  const newItems = (dailyPack?.newItemIds ?? [])
+    .filter((itemId) => !completedNewItemIds.has(itemId))
+    .map((itemId) => itemMap.get(itemId))
+    .filter((item): item is VocabularyItem => Boolean(item))
+    .filter((item) => !dueIds.has(item.id));
 
-  return [...dueItems, ...newItems];
+  return {
+    dueItems,
+    newItems,
+    queue: [...dueItems, ...newItems],
+  };
 }
 
 export function getStudyQueueBreakdown(
   settings: AppSettings,
   vocabItems: VocabularyItem[],
   progress: ProgressSnapshot,
+  dailyPack: DailyPackSnapshot | null,
   now: string,
 ): StudyQueueBreakdown {
   const eligibleItems = getEligibleItems(settings, vocabItems);
@@ -89,14 +147,16 @@ export function getStudyQueueBreakdown(
     const record = progress.itemRecords[item.id];
     return Boolean(record?.nextReviewAt && record.nextReviewAt <= now);
   }).length;
-  const newItemCount = eligibleItems.filter((item) => !progress.itemRecords[item.id]).length;
+  const remainingNewItemCount =
+    (dailyPack?.newItemIds.length ?? 0) - (dailyPack?.completedNewItemIds.length ?? 0);
   const totalCount =
-    Math.min(dueReviewCount, settings.dailyReviewLimit) +
-    Math.min(newItemCount, settings.dailyNewItemCount);
+    Math.min(dueReviewCount, settings.dailyReviewLimit) + Math.max(remainingNewItemCount, 0);
 
   return {
     dueReviewCount,
-    newItemCount,
+    dailyPackSize: dailyPack?.newItemIds.length ?? 0,
+    remainingNewItemCount: Math.max(remainingNewItemCount, 0),
+    dailyPackGenerated: Boolean(dailyPack?.generated),
     totalCount,
   };
 }
@@ -199,5 +259,28 @@ export function applySessionResultsToProgress(
     masteredCount,
     lastStudiedAt: completedAt,
     itemRecords: nextRecords,
+  };
+}
+
+export function updateDailyPackCompletion(
+  dailyPack: DailyPackSnapshot | null,
+  results: SessionItemResult[],
+): DailyPackSnapshot | null {
+  if (!dailyPack) {
+    return null;
+  }
+
+  const packIds = new Set(dailyPack.newItemIds);
+  const nextCompleted = new Set(dailyPack.completedNewItemIds);
+
+  for (const result of results) {
+    if (packIds.has(result.itemId)) {
+      nextCompleted.add(result.itemId);
+    }
+  }
+
+  return {
+    ...dailyPack,
+    completedNewItemIds: Array.from(nextCompleted),
   };
 }

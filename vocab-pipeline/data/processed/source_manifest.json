@@ -1,0 +1,15 @@
+{
+  "sources": [
+    {
+      "name": "seed_backbone",
+      "type": "pending",
+      "notes": "Fill in source URL, license, and acquisition details."
+    },
+    {
+      "name": "seed_dictionary",
+      "type": "pending",
+      "notes": "Fill in source URL, license, and acquisition details."
+    }
+  ],
+  "entryCount": 3634
+}

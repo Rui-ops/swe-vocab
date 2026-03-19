@@ -9,9 +9,17 @@ import {
 import {
   applySessionResultsToProgress,
   buildDailyStudyQueue,
+  ensureDailyPack,
+  getLocalDateKey,
   getStudyQueueBreakdown,
+  updateDailyPackCompletion,
 } from "../lib/review/engine";
-import type { AppSettings, ProgressSnapshot, VocabularyItem } from "../types/models";
+import type {
+  AppSettings,
+  DailyPackSnapshot,
+  ProgressSnapshot,
+  VocabularyItem,
+} from "../types/models";
 
 const now = "2026-03-18T10:00:00.000Z";
 
@@ -57,7 +65,7 @@ const vocabItems: VocabularyItem[] = [
     english: ["advanced"],
     partOfSpeech: "adjective",
     frequencyRank: 3,
-    cefrLevel: "B1",
+    cefrLevel: "A2",
     packIds: ["core"],
     tags: [],
     priority: 3,
@@ -105,19 +113,70 @@ const seededProgress: ProgressSnapshot = {
   },
 };
 
-describe("review engine", () => {
-  it("builds a queue from due review items plus capped new items", () => {
-    expect(buildDailyStudyQueue(settings, vocabItems, seededProgress, now).map((item) => item.id)).toEqual([
-      "1",
-      "2",
-    ]);
+const todayDailyPack: DailyPackSnapshot = {
+  date: "2026-03-18",
+  newItemIds: ["2", "3"],
+  completedNewItemIds: [],
+  generated: true,
+};
+
+describe("daily pack and review engine", () => {
+  it("formats local date keys", () => {
+    expect(getLocalDateKey(new Date("2026-03-18T10:00:00.000Z"))).toBe("2026-03-18");
   });
 
-  it("exposes due and new counts for the home screen", () => {
-    expect(getStudyQueueBreakdown(settings, vocabItems, seededProgress, now)).toEqual({
+  it("generates one fixed pack for a given day", () => {
+    const pack = ensureDailyPack(settings, vocabItems, emptyProgress, null, "2026-03-18");
+    expect(pack).toEqual({
+      date: "2026-03-18",
+      newItemIds: ["1", "2"],
+      completedNewItemIds: [],
+      generated: true,
+    });
+  });
+
+  it("reuses an existing pack on the same day", () => {
+    expect(ensureDailyPack(settings, vocabItems, emptyProgress, todayDailyPack, "2026-03-18")).toBe(
+      todayDailyPack,
+    );
+  });
+
+  it("builds queue from due reviews plus remaining items in today's pack", () => {
+    const queue = buildDailyStudyQueue(settings, vocabItems, seededProgress, todayDailyPack, now);
+    expect(queue.dueItems.map((item) => item.id)).toEqual(["1"]);
+    expect(queue.newItems.map((item) => item.id)).toEqual(["2", "3"]);
+    expect(queue.queue.map((item) => item.id)).toEqual(["1", "2", "3"]);
+  });
+
+  it("does not backfill a new pack after the current day's pack is exhausted", () => {
+    const exhaustedPack: DailyPackSnapshot = {
+      ...todayDailyPack,
+      completedNewItemIds: ["2", "3"],
+    };
+    const queue = buildDailyStudyQueue(settings, vocabItems, seededProgress, exhaustedPack, now);
+    expect(queue.newItems).toEqual([]);
+    expect(queue.queue.map((item) => item.id)).toEqual(["1"]);
+  });
+
+  it("exposes today's pack metrics for the home screen", () => {
+    expect(getStudyQueueBreakdown(settings, vocabItems, seededProgress, todayDailyPack, now)).toEqual({
       dueReviewCount: 1,
-      newItemCount: 1,
-      totalCount: 2,
+      dailyPackSize: 2,
+      remainingNewItemCount: 2,
+      dailyPackGenerated: true,
+      totalCount: 3,
+    });
+  });
+
+  it("updates daily pack completion after a session", () => {
+    expect(
+      updateDailyPackCompletion(todayDailyPack, [
+        { itemId: "2", mode: "svToEn", rating: "easy" },
+        { itemId: "1", mode: "svToEn", rating: "hard" },
+      ]),
+    ).toEqual({
+      ...todayDailyPack,
+      completedNewItemIds: ["2"],
     });
   });
 
@@ -150,18 +209,24 @@ describe("review engine", () => {
 
 describe("study session helpers", () => {
   it("uses the first enabled mode for the session", () => {
-    const session = createStudySession(settings, vocabItems, seededProgress, now);
+    const session = createStudySession(settings, vocabItems, seededProgress, todayDailyPack, now);
     expect(session?.mode).toBe("svToEn");
   });
 
   it("returns null when no eligible items are available", () => {
     expect(
-      createStudySession({ ...settings, enabledPackIds: ["missing"] }, vocabItems, emptyProgress, now),
+      createStudySession(
+        { ...settings, enabledPackIds: ["missing"] },
+        vocabItems,
+        emptyProgress,
+        null,
+        now,
+      ),
     ).toBeNull();
   });
 
   it("blocks rating before reveal", () => {
-    const session = createStudySession(settings, vocabItems, emptyProgress, now);
+    const session = createStudySession(settings, vocabItems, emptyProgress, todayDailyPack, now);
     if (!session) {
       throw new Error("session should exist");
     }
@@ -172,27 +237,27 @@ describe("study session helpers", () => {
   });
 
   it("queues one retry for a wrong answer near the end of the session", () => {
-    const firstSession = createStudySession(settings, vocabItems, emptyProgress, now);
+    const firstSession = createStudySession(settings, vocabItems, emptyProgress, todayDailyPack, now);
     if (!firstSession) {
       throw new Error("session should exist");
     }
 
     const wrongResult = applyRating(revealCurrentCard(firstSession), "wrong", now);
     expect(wrongResult.nextSession?.queue).toHaveLength(3);
-    expect(wrongResult.nextSession?.retryQueuedItemIds).toEqual(["1"]);
+    expect(wrongResult.nextSession?.retryQueuedItemIds).toEqual(["2"]);
 
     const secondCard = getCurrentStudyCard(wrongResult.nextSession);
-    expect(secondCard?.itemId).toBe("2");
+    expect(secondCard?.itemId).toBe("3");
     expect(secondCard?.position).toBe(2);
   });
 
-  it("completes on the last queued card and includes retry results in the summary", () => {
-    const firstSession = createStudySession(settings, vocabItems, emptyProgress, now);
-    if (!firstSession) {
+  it("completes on the last queued card and includes summary totals", () => {
+    const session = createStudySession(settings, vocabItems, seededProgress, todayDailyPack, now);
+    if (!session) {
       throw new Error("session should exist");
     }
 
-    const first = applyRating(revealCurrentCard(firstSession), "wrong", now);
+    const first = applyRating(revealCurrentCard(session), "easy", now);
     if (!first.nextSession) {
       throw new Error("next session should exist");
     }
@@ -202,18 +267,23 @@ describe("study session helpers", () => {
       throw new Error("next session should exist");
     }
 
-    const retryCard = getCurrentStudyCard(second.nextSession);
-    expect(retryCard?.itemId).toBe("1");
-    expect(retryCard?.position).toBe(3);
+    const final = applyRating(revealCurrentCard(second.nextSession), "wrong", now);
+    expect(final.nextSession?.queue).toHaveLength(4);
 
-    const finalResult = applyRating(revealCurrentCard(second.nextSession), "easy", now);
-    expect(finalResult.nextSession).toBeNull();
-    expect(finalResult.completedSummary).toEqual({
+    if (!final.nextSession) {
+      throw new Error("retry session should exist");
+    }
+
+    const retry = applyRating(revealCurrentCard(final.nextSession), "easy", now);
+    expect(retry.nextSession).toBeNull();
+    expect(retry.completedSummary).toEqual({
       id: `session-${now}`,
       completedAt: now,
       mode: "svToEn",
-      studiedCount: 3,
-      easyCount: 2,
+      studiedCount: 4,
+      reviewCount: 0,
+      newCount: 0,
+      easyCount: 3,
       hardCount: 0,
       wrongCount: 1,
     });
@@ -227,6 +297,8 @@ describe("study session helpers", () => {
         completedAt: now,
         mode: "svToEn",
         studiedCount: 3,
+        reviewCount: 1,
+        newCount: 2,
         easyCount: 2,
         hardCount: 0,
         wrongCount: 1,

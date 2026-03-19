@@ -13,6 +13,12 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def _reset_json_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+    for child in path.glob("*.json"):
+        child.unlink()
+
+
 def export_outputs(
     entries: list[dict[str, Any]],
     processed_dir: Path,
@@ -87,6 +93,7 @@ def _write_csv(path: Path, entries: list[dict[str, Any]]) -> None:
 
 
 def _export_packs(packs_dir: Path, entries: list[dict[str, Any]]) -> None:
+    _reset_json_dir(packs_dir)
     grouped: dict[str, list[dict[str, Any]]] = {}
     for entry in entries:
         for pack_id in entry["packIds"]:
@@ -97,6 +104,7 @@ def _export_packs(packs_dir: Path, entries: list[dict[str, Any]]) -> None:
 
 
 def _export_levels(levels_dir: Path, entries: list[dict[str, Any]]) -> None:
+    _reset_json_dir(levels_dir)
     grouped: dict[str, list[dict[str, Any]]] = {}
     for entry in entries:
         grouped.setdefault(entry["cefrLevel"], []).append(entry)
@@ -117,4 +125,3 @@ def _build_source_manifest(source_names: list[str], entries: list[dict[str, Any]
         ],
         "entryCount": len(entries),
     }
-

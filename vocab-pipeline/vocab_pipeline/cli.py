@@ -5,6 +5,8 @@ from pathlib import Path
 
 from .normalize import normalize_json_file
 from .pipeline import merge_and_export
+from .seed import generate_seed_files
+from .sync import sync_app_data
 from .validate import validate_json_file
 
 
@@ -20,6 +22,10 @@ def build_parser() -> argparse.ArgumentParser:
     validate_parser = subparsers.add_parser("validate-json", help="Validate a normalized JSON file")
     validate_parser.add_argument("--input", required=True, type=Path)
 
+    seed_parser = subparsers.add_parser("generate-seed", help="Generate a large seed vocabulary dataset")
+    seed_parser.add_argument("--backbone-output", required=True, type=Path)
+    seed_parser.add_argument("--dictionary-output", required=True, type=Path)
+
     export_parser = subparsers.add_parser(
         "merge-export", help="Merge normalized sources and export app-ready outputs"
     )
@@ -29,6 +35,12 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument("--config-dir", required=True, type=Path)
     export_parser.add_argument("--raw-dir", required=True, type=Path)
     export_parser.add_argument("--project-root", required=True, type=Path)
+
+    sync_parser = subparsers.add_parser(
+        "sync-app-data", help="Copy processed vocab output into the app data directory"
+    )
+    sync_parser.add_argument("--processed-input", required=True, type=Path)
+    sync_parser.add_argument("--app-data-dir", required=True, type=Path)
 
     return parser
 
@@ -50,6 +62,11 @@ def main() -> int:
         print(f"validated {args.input}")
         return 0
 
+    if args.command == "generate-seed":
+        count = generate_seed_files(args.backbone_output, args.dictionary_output)
+        print(f"generated {count} seed entries")
+        return 0
+
     if args.command == "merge-export":
         count = merge_and_export(
             backbone_input=args.backbone_input,
@@ -60,6 +77,11 @@ def main() -> int:
             project_root=args.project_root,
         )
         print(f"exported {count} curated entries into {args.processed_dir}")
+        return 0
+
+    if args.command == "sync-app-data":
+        count = sync_app_data(args.processed_input, args.app_data_dir)
+        print(f"synced {count} entries into {args.app_data_dir}")
         return 0
 
     raise ValueError(f"unknown command: {args.command}")

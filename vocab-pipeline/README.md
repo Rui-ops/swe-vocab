@@ -4,7 +4,7 @@ Python-based ingestion and export scaffold for the Swedish vocab app.
 
 ## Lean V1 Goal
 
-- normalize one small starter dataset
+- generate and maintain one app-ready Swedish vocabulary library of 3,000+ entries
 - merge one backbone input with one enrichment input when needed
 - export one app-ready JSON dataset the app can consume directly
 - keep manual overrides and validation simple and reproducible
@@ -29,6 +29,15 @@ PYTHONPATH=. python3 -m vocab_pipeline.cli normalize-json \
   --input data/raw/example.json \
   --output data/intermediate/example.normalized.json \
   --source-name example_source
+```
+
+Generate the large seed source files used for the current pipeline-backed library:
+
+```bash
+cd vocab-pipeline
+PYTHONPATH=. python3 -m vocab_pipeline.cli generate-seed \
+  --backbone-output data/raw/seed/backbone_seed.json \
+  --dictionary-output data/raw/seed/dictionary_seed.json
 ```
 
 Validate a normalized file independently:
@@ -57,6 +66,15 @@ PYTHONPATH=. python3 -m vocab_pipeline.cli merge-export \
   --config-dir config \
   --raw-dir data/raw \
   --project-root .
+```
+
+Sync the generated master dataset into the app:
+
+```bash
+cd vocab-pipeline
+PYTHONPATH=. python3 -m vocab_pipeline.cli sync-app-data \
+  --processed-input data/processed/vocab_master.json \
+  --app-data-dir ../app/public/data
 ```
 
 ## Canonical item schema
@@ -125,5 +143,7 @@ The pipeline already supports the lean v1 path:
 - merge by `normalizedKey`
 - simple manual overrides and exclusions
 - export of one app-ready dataset plus secondary files
+- reproducible generation of a 3,634-entry seed-backed dataset
+- sync of processed app data into the frontend
 
-Do not expand configuration or export complexity unless it directly improves the first starter dataset.
+Do not expand configuration or export complexity unless it directly improves the current 3,000+ app dataset.

@@ -10,7 +10,7 @@ export function PacksScreen({ packs, settings }: PacksScreenProps) {
   return (
     <ScreenLayout
       title="Packs"
-      subtitle="Supporting view only. Lean v1 succeeds with one starter pack and a reliable daily loop."
+      subtitle="Supporting view only. The generated library is organized by CEFR core packs."
     >
       <div className="stack">
         {packs.map((pack) => {

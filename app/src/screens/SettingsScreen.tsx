@@ -34,7 +34,7 @@ export function SettingsScreen({ levels, packs, settings, onChange }: SettingsSc
   return (
     <ScreenLayout
       title="Settings"
-      subtitle="Lean v1 settings: one starter pack, one primary study direction, and a few daily limits."
+      subtitle="Daily study settings with CEFR core packs, one primary study direction, and daily limits."
     >
       <div className="stack">
         <label className="field">
@@ -80,7 +80,7 @@ export function SettingsScreen({ levels, packs, settings, onChange }: SettingsSc
           <input
             type="number"
             min="1"
-            max="20"
+            max="100"
             value={settings.dailyNewItemCount}
             onChange={(event) =>
               onChange({
@@ -108,9 +108,10 @@ export function SettingsScreen({ levels, packs, settings, onChange }: SettingsSc
         </label>
 
         <div className="panel">
-          <p className="field__label">Starter content</p>
+          <p className="field__label">Enabled core packs</p>
           <p className="meta">
-            Lean v1 ships with one starter pack to keep the daily loop focused.
+            The larger library is organized primarily by CEFR core packs. Keep the packs you want
+            in your daily pool enabled.
           </p>
           {packs.map((pack) => (
             <label className="checkbox" key={pack.id}>

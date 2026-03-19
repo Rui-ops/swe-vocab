@@ -122,7 +122,77 @@ class PipelineTests(unittest.TestCase):
             self.assertTrue((root / "ATTRIBUTION.md").exists())
             self.assertTrue((root / "LICENSE_NOTES.md").exists())
 
+    def test_merge_and_export_replaces_stale_generated_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            processed_dir = root / "processed"
+            config_dir = root / "config"
+            raw_dir = root / "raw"
+            (processed_dir / "packs").mkdir(parents=True)
+            (processed_dir / "levels").mkdir(parents=True)
+            (processed_dir / "packs" / "conversation_chunks.json").write_text("[]", encoding="utf-8")
+            (processed_dir / "levels" / "C1.json").write_text("[]", encoding="utf-8")
+            (config_dir / "pack_rules").mkdir(parents=True)
+            (config_dir / "tag_rules").mkdir(parents=True)
+            (config_dir / "priority_rules").mkdir(parents=True)
+            (raw_dir / "manual").mkdir(parents=True)
+
+            (config_dir / "pack_rules" / "default_pack_rules.json").write_text(
+                json.dumps({"cefrCorePacks": {"A1": "a1_core"}, "tagToPackIds": {}}),
+                encoding="utf-8",
+            )
+            (config_dir / "tag_rules" / "default_tag_rules.json").write_text(
+                json.dumps({"partOfSpeechTags": {}, "priorityTags": {}}),
+                encoding="utf-8",
+            )
+            (config_dir / "priority_rules" / "default_priority_rules.json").write_text(
+                json.dumps({"rankBands": [{"maxRank": 500, "priority": 5}], "fallbackPriority": 2}),
+                encoding="utf-8",
+            )
+            (raw_dir / "manual" / "manual_overrides.json").write_text("[]", encoding="utf-8")
+            (raw_dir / "manual" / "exclusions.json").write_text("[]", encoding="utf-8")
+            (raw_dir / "manual" / "custom_pack_assignments.json").write_text("[]", encoding="utf-8")
+
+            backbone_path = root / "backbone.json"
+            dictionary_path = root / "dictionary.json"
+            backbone_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "id": "backbone-1",
+                            "lemma": "dag",
+                            "swedish": "dag",
+                            "english": ["day"],
+                            "partOfSpeech": "noun",
+                            "frequencyRank": 190,
+                            "cefrLevel": "A1",
+                            "packIds": [],
+                            "tags": [],
+                            "priority": 3,
+                            "sources": [{"name": "backbone", "sourceId": "1"}],
+                            "normalizedKey": "dag|noun",
+                            "isPhrase": False,
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            dictionary_path.write_text("[]", encoding="utf-8")
+
+            merge_and_export(
+                backbone_input=backbone_path,
+                dictionary_input=dictionary_path,
+                processed_dir=processed_dir,
+                config_dir=config_dir,
+                raw_dir=raw_dir,
+                project_root=root,
+            )
+
+            self.assertFalse((processed_dir / "packs" / "conversation_chunks.json").exists())
+            self.assertFalse((processed_dir / "levels" / "C1.json").exists())
+            self.assertTrue((processed_dir / "packs" / "a1_core.json").exists())
+            self.assertTrue((processed_dir / "levels" / "A1.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
-

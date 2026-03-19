@@ -6,10 +6,5 @@
     "B1+": "b1plus_conversation",
     "B2": "b2_core"
   },
-  "tagToPackIds": {
-    "daily_life": ["daily_life"],
-    "conversation": ["conversation_chunks"],
-    "time": ["time_and_schedule"]
-  }
+  "tagToPackIds": {}
 }
-

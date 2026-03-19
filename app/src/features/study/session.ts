@@ -1,6 +1,7 @@
 import type {
   ActiveStudySession,
   AppSettings,
+  DailyPackSnapshot,
   ProgressSnapshot,
   RecallRating,
   SessionItemResult,
@@ -14,18 +15,19 @@ export function createStudySession(
   settings: AppSettings,
   vocabItems: VocabularyItem[],
   progress: ProgressSnapshot,
+  dailyPack: DailyPackSnapshot | null,
   now: string,
 ): ActiveStudySession | null {
-  const queue = buildDailyStudyQueue(settings, vocabItems, progress, now);
+  const studyQueue = buildDailyStudyQueue(settings, vocabItems, progress, dailyPack, now);
   const mode = settings.enabledTestModes[0];
 
-  if (queue.length === 0 || !mode) {
+  if (studyQueue.queue.length === 0 || !mode) {
     return null;
   }
 
   return {
     mode,
-    queue,
+    queue: studyQueue.queue,
     currentIndex: 0,
     isAnswerRevealed: false,
     retryQueuedItemIds: [],
@@ -142,6 +144,8 @@ function createSessionSummary(
     completedAt,
     mode,
     studiedCount: results.length,
+    reviewCount: 0,
+    newCount: 0,
     easyCount,
     hardCount,
     wrongCount,

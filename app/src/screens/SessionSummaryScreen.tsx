@@ -30,6 +30,9 @@ export function SessionSummaryScreen({ summary }: SessionSummaryScreenProps) {
         <p className="eyebrow">Mode</p>
         <h2>{summary.mode === "svToEn" ? "Swedish -> English" : "English -> Swedish"}</h2>
         <p className="meta">{new Date(summary.completedAt).toLocaleString()}</p>
+        <p className="meta">
+          {summary.reviewCount} review • {summary.newCount} from today&apos;s pack
+        </p>
       </div>
       <div className="grid grid--two">
         <StatCard label="Studied" value={summary.studiedCount} />
