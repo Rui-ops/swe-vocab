@@ -23,7 +23,7 @@ def load_manual_inputs(raw_dir: Path) -> dict[str, Any]:
     manual_dir = raw_dir / "manual"
     return {
         "manual_overrides": load_json_file(manual_dir / "manual_overrides.json"),
+        "curated_examples": load_json_file(manual_dir / "curated_examples.json"),
         "exclusions": load_json_file(manual_dir / "exclusions.json"),
         "custom_pack_assignments": load_json_file(manual_dir / "custom_pack_assignments.json"),
     }
-

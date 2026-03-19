@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from collections import Counter
 from pathlib import Path
 
 from vocab_pipeline.seed import generate_seed_files
@@ -23,6 +24,8 @@ class SeedAndSyncTests(unittest.TestCase):
             self.assertTrue(dictionary.exists())
             backbone_entries = json.loads(backbone.read_text(encoding="utf-8"))
             self.assertEqual(len(backbone_entries), count)
+            part_counts = Counter(entry["partOfSpeech"] for entry in backbone_entries)
+            self.assertGreater(part_counts["noun"], part_counts["phrase"])
 
     def test_sync_app_data_writes_vocab_packs_and_levels(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

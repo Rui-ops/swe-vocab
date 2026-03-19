@@ -48,6 +48,18 @@ class PipelineTests(unittest.TestCase):
                 encoding="utf-8",
             )
             (raw_dir / "manual" / "manual_overrides.json").write_text("[]", encoding="utf-8")
+            (raw_dir / "manual" / "curated_examples.json").write_text(
+                json.dumps(
+                    [
+                        {
+                            "id": "dag|noun",
+                            "exampleSv": "Jag har tid i dag.",
+                            "exampleEn": "I have time today.",
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
             (raw_dir / "manual" / "exclusions.json").write_text("[]", encoding="utf-8")
             (raw_dir / "manual" / "custom_pack_assignments.json").write_text("[]", encoding="utf-8")
 
@@ -115,6 +127,8 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(master_entries[0]["english"], ["day", "daytime"])
             self.assertIn("a1_core", master_entries[0]["packIds"])
             self.assertIn("conversation_chunks", master_entries[0]["packIds"])
+            self.assertEqual(master_entries[0]["exampleSv"], "Jag har tid i dag.")
+            self.assertEqual(master_entries[0]["exampleEn"], "I have time today.")
             self.assertTrue((processed_dir / "vocab_master.csv").exists())
             self.assertTrue((processed_dir / "packs" / "a1_core.json").exists())
             self.assertTrue((processed_dir / "levels" / "A1.json").exists())
@@ -150,6 +164,7 @@ class PipelineTests(unittest.TestCase):
                 encoding="utf-8",
             )
             (raw_dir / "manual" / "manual_overrides.json").write_text("[]", encoding="utf-8")
+            (raw_dir / "manual" / "curated_examples.json").write_text("[]", encoding="utf-8")
             (raw_dir / "manual" / "exclusions.json").write_text("[]", encoding="utf-8")
             (raw_dir / "manual" / "custom_pack_assignments.json").write_text("[]", encoding="utf-8")
 

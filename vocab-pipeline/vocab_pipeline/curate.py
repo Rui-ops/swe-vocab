@@ -31,6 +31,7 @@ def curate_entries(
     manual_inputs: dict[str, Any],
 ) -> list[dict[str, Any]]:
     exclusions = set(str(value) for value in manual_inputs["exclusions"])
+    curated_examples = {str(item["id"]): item for item in manual_inputs["curated_examples"]}
     custom_pack_assignments = {
         str(item["id"]): [str(pack_id) for pack_id in item["packIds"]]
         for item in manual_inputs["custom_pack_assignments"]
@@ -68,6 +69,15 @@ def curate_entries(
             derived_packs.extend(custom_pack_assignments[next_entry["id"]])
         next_entry["packIds"] = _merge_unique_strings(derived_packs)
 
+        example_override = curated_examples.get(next_entry["id"]) or curated_examples.get(
+            next_entry["normalizedKey"]
+        )
+        if example_override:
+            if example_override.get("exampleSv"):
+                next_entry["exampleSv"] = str(example_override["exampleSv"])
+            if example_override.get("exampleEn"):
+                next_entry["exampleEn"] = str(example_override["exampleEn"])
+
         overrides = manual_overrides.get(next_entry["id"]) or manual_overrides.get(
             next_entry["normalizedKey"]
         )
@@ -80,4 +90,3 @@ def curate_entries(
         curated.append(next_entry)
 
     return curated
-

@@ -1,0 +1,152 @@
+[
+  {
+    "id": "dag|noun",
+    "exampleSv": "Jag har mycket att göra i dag.",
+    "exampleEn": "I have a lot to do today."
+  },
+  {
+    "id": "vecka|noun",
+    "exampleSv": "Nästa vecka börjar min nya kurs.",
+    "exampleEn": "My new course starts next week."
+  },
+  {
+    "id": "år|noun",
+    "exampleSv": "Han har bott i Stockholm i tre år.",
+    "exampleEn": "He has lived in Stockholm for three years."
+  },
+  {
+    "id": "tid|noun",
+    "exampleSv": "Har du tid att prata en stund?",
+    "exampleEn": "Do you have time to talk for a moment?"
+  },
+  {
+    "id": "vän|noun",
+    "exampleSv": "Min vän kommer på middag i kväll.",
+    "exampleEn": "My friend is coming for dinner tonight."
+  },
+  {
+    "id": "familj|noun",
+    "exampleSv": "Hela familjen samlas på söndag.",
+    "exampleEn": "The whole family is gathering on Sunday."
+  },
+  {
+    "id": "barn|noun",
+    "exampleSv": "Barnen leker ute på gården.",
+    "exampleEn": "The children are playing outside in the yard."
+  },
+  {
+    "id": "hem|noun",
+    "exampleSv": "Jag vill gå hem efter jobbet.",
+    "exampleEn": "I want to go home after work."
+  },
+  {
+    "id": "bok|noun",
+    "exampleSv": "Hon läser en bok på tåget.",
+    "exampleEn": "She is reading a book on the train."
+  },
+  {
+    "id": "arbete|noun",
+    "exampleSv": "Mitt arbete är intressant men krävande.",
+    "exampleEn": "My work is interesting but demanding."
+  },
+  {
+    "id": "problem|noun",
+    "exampleSv": "Vi måste lösa det här problemet snabbt.",
+    "exampleEn": "We need to solve this problem quickly."
+  },
+  {
+    "id": "lösning|noun",
+    "exampleSv": "Det finns en enkel lösning på frågan.",
+    "exampleEn": "There is a simple solution to the question."
+  },
+  {
+    "id": "vara|verb",
+    "exampleSv": "Hon vill vara hemma i kväll.",
+    "exampleEn": "She wants to be at home tonight."
+  },
+  {
+    "id": "ha|verb",
+    "exampleSv": "Vi har ett möte efter lunch.",
+    "exampleEn": "We have a meeting after lunch."
+  },
+  {
+    "id": "göra|verb",
+    "exampleSv": "Vad ska du göra i helgen?",
+    "exampleEn": "What are you going to do this weekend?"
+  },
+  {
+    "id": "komma|verb",
+    "exampleSv": "Kan du komma lite tidigare i morgon?",
+    "exampleEn": "Can you come a little earlier tomorrow?"
+  },
+  {
+    "id": "gå|verb",
+    "exampleSv": "Jag går till jobbet varje morgon.",
+    "exampleEn": "I walk to work every morning."
+  },
+  {
+    "id": "vilja|verb",
+    "exampleSv": "Jag vill lära mig mer svenska.",
+    "exampleEn": "I want to learn more Swedish."
+  },
+  {
+    "id": "behöva|verb",
+    "exampleSv": "Vi behöver mer tid för uppgiften.",
+    "exampleEn": "We need more time for the task."
+  },
+  {
+    "id": "förstå|verb",
+    "exampleSv": "Nu börjar jag förstå texten bättre.",
+    "exampleEn": "Now I am starting to understand the text better."
+  },
+  {
+    "id": "stor|adjective",
+    "exampleSv": "De bor i en stor lägenhet nära centrum.",
+    "exampleEn": "They live in a large apartment near the center."
+  },
+  {
+    "id": "liten|adjective",
+    "exampleSv": "Hon bor i en liten stad vid kusten.",
+    "exampleEn": "She lives in a small town by the coast."
+  },
+  {
+    "id": "bra|adjective",
+    "exampleSv": "Det här är en bra början.",
+    "exampleEn": "This is a good start."
+  },
+  {
+    "id": "viktig|adjective",
+    "exampleSv": "Det är viktigt att komma i tid.",
+    "exampleEn": "It is important to arrive on time."
+  },
+  {
+    "id": "enkel|adjective",
+    "exampleSv": "Frågan ser enkel ut men är svår att svara på.",
+    "exampleEn": "The question looks simple but is hard to answer."
+  },
+  {
+    "id": "svår|adjective",
+    "exampleSv": "Det var svårt att välja mellan alternativen.",
+    "exampleEn": "It was difficult to choose between the options."
+  },
+  {
+    "id": "idag|adverb",
+    "exampleSv": "Jag arbetar hemma i dag.",
+    "exampleEn": "I am working from home today."
+  },
+  {
+    "id": "imorgon|adverb",
+    "exampleSv": "Vi ses igen i morgon.",
+    "exampleEn": "We will see each other again tomorrow."
+  },
+  {
+    "id": "nu|adverb",
+    "exampleSv": "Nu måste vi fatta ett beslut.",
+    "exampleEn": "Now we need to make a decision."
+  },
+  {
+    "id": "snart|adverb",
+    "exampleSv": "Bussen kommer snart.",
+    "exampleEn": "The bus will arrive soon."
+  }
+]

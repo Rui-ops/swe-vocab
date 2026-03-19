@@ -4,7 +4,7 @@
     "title": "A1 Core",
     "description": "Essential beginner vocabulary.",
     "cefrLevel": "A1",
-    "itemCount": 908,
+    "itemCount": 947,
     "tags": [
       "common",
       "conversation",
@@ -19,11 +19,9 @@
     "title": "A2 Core",
     "description": "High-value everyday vocabulary.",
     "cefrLevel": "A2",
-    "itemCount": 908,
+    "itemCount": 947,
     "tags": [
       "common",
-      "conversation",
-      "spoken",
       "useful"
     ]
   },
@@ -32,7 +30,7 @@
     "title": "B1 Core",
     "description": "Independent user conversation vocabulary.",
     "cefrLevel": "B1",
-    "itemCount": 908,
+    "itemCount": 947,
     "tags": [
       "common",
       "conversation",
@@ -44,7 +42,7 @@
     "title": "B2 Core",
     "description": "More flexible and discussion-ready vocabulary.",
     "cefrLevel": "B2",
-    "itemCount": 910,
+    "itemCount": 948,
     "tags": [
       "common",
       "conversation",
